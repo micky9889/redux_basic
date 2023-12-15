@@ -1,0 +1,71 @@
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteTodo, fetchTodo } from "./redux/todoSlicer";
+import { Link } from "react-router-dom";
+import { Button } from "@mui/material";
+
+const Todo = () => {
+  const dispatch = useDispatch();
+  const result = useSelector((state) => state.todo);
+  useEffect(() => {
+    dispatch(fetchTodo());
+    // console.log(result);
+  }, [dispatch]);
+  //delete method
+  //   const deleteItem = (id) => {
+  //     dispatch(deleteTodo(id))
+  //       .then(() => {
+  //         dispatch(fetchTodo());
+  //       })
+  //       .catch((error) => {
+  //         // Handle errors if needed
+  //         console.error("Error deleting todo:", error);
+  //       });
+  //   };
+  const deleteItem = async (id) => {
+    try {
+      await dispatch(deleteTodo(id));
+      dispatch(fetchTodo());
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+    }
+  };
+  return (
+    <div>
+      <Link to="/create">
+        <Button variant="outlined">add +</Button>
+      </Link>
+
+      {result.isLoading ? (
+        <h1>Loading...</h1>
+      ) : (
+        result.data.map((todo) => (
+          <div
+            key={todo.id}
+            style={{ display: "flex", justifyContent: "space-around" }}
+          >
+            <p>{todo.id}./</p>
+            <p>{todo.fname},</p>
+            <p>{todo.lname},</p>
+            <p>{todo.username}</p>
+            <img src={todo.avatar} width={40} height={40} />
+            <Link to={`/update/${todo.id}`}>      
+            <Button variant="outlined">
+              edit
+            </Button>
+            </Link>
+            <Button
+              color="error"
+              variant="outlined"
+              onClick={() => deleteItem(todo.id)}
+            >
+              delete
+            </Button>
+          </div>
+        ))
+      )}
+    </div>
+  );
+};
+
+export default Todo;
