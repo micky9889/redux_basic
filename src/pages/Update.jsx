@@ -10,6 +10,13 @@ const Update = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
   //   const todo = useSelector((state) => state.todo.data.find((x) => x.id == id));
+  // select properties from todo slice
+  const {
+    data: todos,
+    todoDetail,
+    isLoading,
+    success,
+  } = useSelector((state) => state.todo);
   const [formData, setFormData] = useState({
     fname: "",
     lname: "",
@@ -18,23 +25,16 @@ const Update = () => {
     email: "",
     avatar: "",
   });
+
+  // fetch to do by id
   useEffect(() => {
-    fetchData();
+    dispatch(fetchTodoById(id));
   }, [dispatch, id]);
 
-  const fetchData = async () => {
-    const todoData = await dispatch(fetchTodoById(id));
-    const dataById = todoData.payload.user;
-    console.log("mick:", dataById);
-    setFormData({
-      fname: dataById.fname,
-      lname: dataById.lname,
-      username: dataById.username,
-      password: dataById.password || "",
-      email: dataById.email || "",
-      avatar: dataById.avatar,
-    });
-  };
+  // Update formData when todoDetail changes
+  useEffect(() => {
+    setFormData(todoDetail);
+  }, [todoDetail]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -46,14 +46,14 @@ const Update = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
     const formDataWithId = {
       ...formData,
-      id: id,
+      // id: id,
     };
     dispatch(updateTodo(formDataWithId));
     navigate("/");
   };
+
   const home = () => {
     navigate("/");
   };
@@ -70,35 +70,38 @@ const Update = () => {
         }}
       >
         <Typography variant="h5">UPDATE USER</Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label="First Name"
-            variant="outlined"
-            name="fname"
-            value={formData.fname}
-            onChange={handleChange}
-            margin="normal"
-            fullWidth
-          />
-          <TextField
-            label="Last Name"
-            variant="outlined"
-            name="lname"
-            value={formData.lname}
-            onChange={handleChange}
-            margin="normal"
-            fullWidth
-          />
-          <TextField
-            label="User Name"
-            variant="outlined"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            margin="normal"
-            fullWidth
-          />
-          {/* <TextField
+        {isLoading ? (
+          <p>loading...</p>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="First Name"
+              variant="outlined"
+              name="fname"
+              value={formData.fname}
+              onChange={handleChange}
+              margin="normal"
+              fullWidth
+            />
+            <TextField
+              label="Last Name"
+              variant="outlined"
+              name="lname"
+              value={formData.lname}
+              onChange={handleChange}
+              margin="normal"
+              fullWidth
+            />
+            <TextField
+              label="User Name"
+              variant="outlined"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              margin="normal"
+              fullWidth
+            />
+            {/* <TextField
             label="Password"
             variant="outlined"
             name="password"
@@ -116,19 +119,20 @@ const Update = () => {
             margin="normal"
             fullWidth
           /> */}
-          <TextField
-            label="Avatar"
-            variant="outlined"
-            name="avatar"
-            value={formData.avatar}
-            onChange={handleChange}
-            margin="normal"
-            fullWidth
-          />
-          <Button type="submit" variant="contained" color="primary" fullWidth>
-            Submit
-          </Button>
-        </form>
+            <TextField
+              label="Avatar"
+              variant="outlined"
+              name="avatar"
+              value={formData.avatar}
+              onChange={handleChange}
+              margin="normal"
+              fullWidth
+            />
+            <Button type="submit" variant="contained" color="primary" fullWidth>
+              Submit
+            </Button>
+          </form>
+        )}
       </Box>
     </Container>
   );

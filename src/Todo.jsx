@@ -6,13 +6,13 @@ import { Button } from "@mui/material";
 
 const Todo = () => {
   const dispatch = useDispatch();
-  const result = useSelector((state) => state.todo);
+  // const result = useSelector((state) => state.todo);
+  const { data, isLoading } = useSelector((state) => state.todo);
   useEffect(() => {
     dispatch(fetchTodo());
-    // console.log(result);
   }, [dispatch]);
   //delete method
-  
+
   const deleteItem = async (id) => {
     try {
       await dispatch(deleteTodo(id));
@@ -27,10 +27,11 @@ const Todo = () => {
         <Button variant="outlined">add +</Button>
       </Link>
 
-      {result.isLoading ? (
+      {isLoading ? (
         <h1>Loading...</h1>
       ) : (
-        result.data.map((todo) => (
+        data &&
+        data.map((todo) => (
           <div
             key={todo.id}
             style={{ display: "flex", justifyContent: "space-around" }}
@@ -40,10 +41,8 @@ const Todo = () => {
             <p>{todo.lname},</p>
             <p>{todo.username}</p>
             <img src={todo.avatar} width={40} height={40} />
-            <Link to={`/update/${todo.id}`}>      
-            <Button variant="outlined">
-              edit
-            </Button>
+            <Link to={`/update/${todo.id}`}>
+              <Button variant="outlined">edit</Button>
             </Link>
             <Button
               color="error"
