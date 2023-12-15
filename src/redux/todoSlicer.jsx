@@ -46,11 +46,10 @@ export const updateTodo = createAsyncThunk("updateTodo", async (requestBody) => 
     };
   
     const response = await fetch(url, {
-      method: "PUT", // Change the method to PUT
+      method: "PUT", 
       headers: headers,
       body: JSON.stringify(requestBody),
     });
-  
     return response.json();
   });
 
@@ -75,8 +74,6 @@ const todoSlice = createSlice({
     });
     //fetch todo by id
     builder.addCase(fetchTodoById.fulfilled, (state,action) => {
-    //   console.log(action.payload);
-    //   state.data=action.payload.user
     });
     // add Todo
     builder.addCase(addTodo.fulfilled, (state, action) => {
@@ -86,9 +83,14 @@ const todoSlice = createSlice({
     builder.addCase(deleteTodo.fulfilled, (state, action) => {  
     });
     //update todo
+    builder.addCase(updateTodo.pending, (state, action) => {
+        console.log("addPending_Update:",action);
+    });
     builder.addCase(updateTodo.fulfilled, (state, action) => {
-        // Handle the update response if needed
-        console.log("update:",action.payload);
+        console.log("addFulffiled_Update:",action);
+    });
+    builder.addCase(updateTodo.rejected, (state, action) => {
+        console.log("addreject_Update:",action);
     });
   },
 });

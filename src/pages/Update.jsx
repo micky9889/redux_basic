@@ -9,21 +9,33 @@ const Update = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams();
-  const todo = useSelector((state) => state.todo.data.find((x) => x.id == id));
-
+  //   const todo = useSelector((state) => state.todo.data.find((x) => x.id == id));
+  const [formData, setFormData] = useState({
+    fname: "",
+    lname: "",
+    username: "",
+    password: "",
+    email: "",
+    avatar: "",
+  });
   useEffect(() => {
-    dispatch(fetchTodoById(id));
-    // console.log("datatodo:",todo);
+    fetchData();
   }, [dispatch, id]);
 
-  const [formData, setFormData] = useState({
-    fname: todo.fname,
-    lname: todo.lname,
-    username: todo.username,
-    password: todo.password || "",
-    email: todo.email || "",
-    avatar: todo.avatar,
-  });
+  const fetchData = async () => {
+    const todoData = await dispatch(fetchTodoById(id));
+    const dataById = todoData.payload.user;
+    console.log("mick:", dataById);
+    setFormData({
+      fname: dataById.fname,
+      lname: dataById.lname,
+      username: dataById.username,
+      password: dataById.password || "",
+      email: dataById.email || "",
+      avatar: dataById.avatar,
+    });
+  };
+
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({
@@ -34,7 +46,7 @@ const Update = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    
+
     const formDataWithId = {
       ...formData,
       id: id,

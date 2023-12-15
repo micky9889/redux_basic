@@ -12,16 +12,7 @@ const Todo = () => {
     // console.log(result);
   }, [dispatch]);
   //delete method
-  //   const deleteItem = (id) => {
-  //     dispatch(deleteTodo(id))
-  //       .then(() => {
-  //         dispatch(fetchTodo());
-  //       })
-  //       .catch((error) => {
-  //         // Handle errors if needed
-  //         console.error("Error deleting todo:", error);
-  //       });
-  //   };
+  
   const deleteItem = async (id) => {
     try {
       await dispatch(deleteTodo(id));
