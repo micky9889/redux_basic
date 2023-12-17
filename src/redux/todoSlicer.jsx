@@ -1,8 +1,4 @@
-import {
-  createSlice,
-  createAsyncThunk,
-  isRejectedWithValue,
-} from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // fetch todo
 export const fetchTodo = createAsyncThunk("fetchTodo", async () => {
@@ -53,17 +49,9 @@ export const addTodo = createAsyncThunk("addTodo", async (requestBody) => {
       body: JSON.stringify(requestBody),
     });
     const response = await data.json();
-    console.log("PostTodoByID response:", response);
-    if (response.status === "error") {
-      console.log(response);
-      return isRejectedWithValue(response);
-    }
     return response;
   } catch (error) {
-    console.log(error);
-    const errorObject = JSON.parse(error.message);
-    console.log(errorObject);
-    return isRejectedWithValue(errorObject);
+    throw new Error(error);
   }
 });
 // delete todo
@@ -119,6 +107,17 @@ const todoSlice = createSlice({
     error: false,
     success: false,
     message: "",
+    status: "",
+  },
+  reducers: {
+    resetState: (state) => {
+      state.isLoading = false;
+      state.todoDetail = {};
+      state.error = false;
+      state.success = false;
+      state.message = "";
+      state.status = "";
+    },
   },
   extraReducers: (builder) => {
     // fetch todo
@@ -133,6 +132,10 @@ const todoSlice = createSlice({
     builder.addCase(fetchTodo.rejected, (state) => {
       state.error = true;
     });
+
+
+
+
     //fetch todo by id
     builder.addCase(fetchTodoById.pending, (state) => {
       state.isLoading = true;
@@ -145,22 +148,39 @@ const todoSlice = createSlice({
     builder.addCase(fetchTodoById.rejected, (state) => {
       state.error = true;
     });
+
+
+
+
     // add Todo
     builder.addCase(addTodo.pending, (state) => {
       state.isLoading = true;
     });
     builder.addCase(addTodo.fulfilled, (state, action) => {
-      console.log("add.fullfilled=>", action.payload);
-      state.success = true;
-      state.message = action.payload.message;
-      state.data.push(action.payload.user);
-    });
-    builder.addCase(addTodo.rejected, (state, action) => {
       console.log(action.payload);
-      console.log("first");
+      state.isLoading = false;
+
+      if (action.payload.status === "ok") {
+        state.status = "ok";
+        state.success = true;
+        state.data.push(action.payload.user);
+      } else {
+        state.status = "error";
+        state.success = false;
+        state.error = true;
+      }
+      state.message = action.payload.message;
+    });
+    builder.addCase(addTodo.rejected, (state) => {
       state.error = true;
+      state.message = "An error has occurred";
+      throw new Error(state.message);
     });
 
+
+
+
+    
     //delete todo
     builder.addCase(deleteTodo.fulfilled, (state, action) => {
       console.log("delete.fullfilled:", action);
@@ -188,4 +208,5 @@ const todoSlice = createSlice({
     });
   },
 });
+export const { resetState } = todoSlice.actions;
 export default todoSlice.reducer;
