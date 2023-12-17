@@ -4,10 +4,11 @@ import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { addTodo } from "../redux/todoSlicer";
 import { useDispatch } from "react-redux";
+import Swal from "sweetalert2";
 
 const Create = () => {
   const navigate = useNavigate();
-  const dispatch=useDispatch()
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
     fname: "",
@@ -26,10 +27,34 @@ const Create = () => {
     });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    dispatch(addTodo(formData))
-    navigate("/");
+    try {
+      const result = await dispatch(addTodo(formData));
+      console.log("res:", result);
+      if (result.payload.status == "ok") {
+        Swal.fire({
+          icon: "success",
+          title: `${result.payload.message}.!`,
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          navigate("/");
+        });
+      }else{
+        Swal.fire({
+          icon: "error",
+          title: `${result.payload.message}.!`,
+          showConfirmButton: false,
+          timer: 1500,
+        })
+        // .then(() => {
+          // navigate("/");
+        // });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   const home = () => {
     navigate("/");

@@ -2,14 +2,14 @@
 import React, { useEffect, useState } from "react";
 import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch,  } from "react-redux";
 import { fetchTodoById, updateTodo } from "../redux/todoSlicer";
 
 const Update = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams();
-  //   const todo = useSelector((state) => state.todo.data.find((x) => x.id == id));
+
   const [formData, setFormData] = useState({
     fname: "",
     lname: "",
@@ -25,7 +25,7 @@ const Update = () => {
   const fetchData = async () => {
     const todoData = await dispatch(fetchTodoById(id));
     const dataById = todoData.payload.user;
-    console.log("mick:", dataById);
+    // console.log("mick:", dataById);
     setFormData({
       fname: dataById.fname,
       lname: dataById.lname,

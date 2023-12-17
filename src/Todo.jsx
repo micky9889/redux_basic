@@ -11,11 +11,11 @@ const Todo = () => {
     dispatch(fetchTodo());
     // console.log(result);
   }, [dispatch]);
+
   //delete method
-  
   const deleteItem = async (id) => {
     try {
-      await dispatch(deleteTodo(id));
+      dispatch(deleteTodo(id));
       dispatch(fetchTodo());
     } catch (error) {
       console.error("Error deleting todo:", error);
@@ -40,10 +40,8 @@ const Todo = () => {
             <p>{todo.lname},</p>
             <p>{todo.username}</p>
             <img src={todo.avatar} width={40} height={40} />
-            <Link to={`/update/${todo.id}`}>      
-            <Button variant="outlined">
-              edit
-            </Button>
+            <Link to={`/update/${todo.id}`}>
+              <Button variant="outlined">edit</Button>
             </Link>
             <Button
               color="error"
