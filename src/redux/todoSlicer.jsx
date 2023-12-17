@@ -1,4 +1,8 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  isRejectedWithValue,
+} from "@reduxjs/toolkit";
 
 // fetch todo
 export const fetchTodo = createAsyncThunk("fetchTodo", async () => {
@@ -37,7 +41,6 @@ export const fetchTodoById = createAsyncThunk("fetchTodoById", async (id) => {
 // });
 // add todo
 export const addTodo = createAsyncThunk("addTodo", async (requestBody) => {
-  console.log('requestBody');
   try {
     const url = "https://www.melivecode.com/api/users/create";
     const headers = {
@@ -50,11 +53,17 @@ export const addTodo = createAsyncThunk("addTodo", async (requestBody) => {
       body: JSON.stringify(requestBody),
     });
     const response = await data.json();
-    console.log("PostTodoByID response:", response); // Log the response
+    console.log("PostTodoByID response:", response);
+    if (response.status === "error") {
+      console.log(response);
+      return isRejectedWithValue(response);
+    }
     return response;
   } catch (error) {
-    console.error("Error PostTodoByID todo:", error);
-    throw error;
+    console.log(error);
+    const errorObject = JSON.parse(error.message);
+    console.log(errorObject);
+    return isRejectedWithValue(errorObject);
   }
 });
 // delete todo
@@ -137,21 +146,18 @@ const todoSlice = createSlice({
       state.error = true;
     });
     // add Todo
-    builder.addCase(addTodo.pending, (state, action) => {
+    builder.addCase(addTodo.pending, (state) => {
       state.isLoading = true;
-      state.message = action.payload.message;
     });
     builder.addCase(addTodo.fulfilled, (state, action) => {
-      state.message = action.payload.message;
-      state.success = true;
-      console.log(state.message);
-      state.data.push(action.payload.user);
       console.log("add.fullfilled=>", action.payload);
+      state.success = true;
+      state.message = action.payload.message;
+      state.data.push(action.payload.user);
     });
-    builder.addCase(addTodo.rejected, (state) => {
-      state.message = "An error has occurred";
-      console.log(state.message);
-
+    builder.addCase(addTodo.rejected, (state, action) => {
+      console.log(action.payload);
+      console.log("first");
       state.error = true;
     });
 

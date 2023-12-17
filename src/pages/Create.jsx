@@ -59,36 +59,33 @@ const Create = () => {
   //   }
   // }, [error, message, isLoading, navigate]);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    try {
-      // const result = await dispatch(addTodo(formData));
-      dispatch(addTodo(formData));
-    } catch (error) {
-      console.log(error);
+    // const result = await dispatch(addTodo(formData));
+    // console.log(result)
+    dispatch(addTodo(formData));
+    if (success) {
+      Swal.fire({
+        icon: "success",
+        // title: `${result.payload.message}.!`,
+        title: `${todoMessage}.!`,
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        navigate("/");
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        // title: `${result.payload.message}.!`,
+        title: `${todoMessage}.!`,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      // .then(() => {
+      // navigate("/");
+      // });
     }
-    // if (success && !error) {
-    //   Swal.fire({
-    //     icon: "success",
-    //     // title: `${result.payload.message}.!`,
-    //     title: `${todoMessage}.!`,
-    //     showConfirmButton: false,
-    //     timer: 1500,
-    //   }).then(() => {
-    //     navigate("/");
-    //   });
-    // } else {
-    //   Swal.fire({
-    //     icon: "error",
-    //     // title: `${result.payload.message}.!`,
-    //     title: `${'error'}.!`,
-    //     showConfirmButton: false,
-    //     timer: 1500,
-    //   });
-    //   // .then(() => {
-    //   // navigate("/");
-    //   // });
-    // }
   };
   const home = () => {
     navigate("/");

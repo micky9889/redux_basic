@@ -6,10 +6,9 @@ import { Button } from "@mui/material";
 
 const Todo = () => {
   const dispatch = useDispatch();
-  const result = useSelector((state) => state.todo);
+  const { data, isLoading, message } = useSelector((state) => state.todo);
   useEffect(() => {
     dispatch(fetchTodo());
-    // console.log(result);
   }, [dispatch]);
 
   //delete method
@@ -27,10 +26,10 @@ const Todo = () => {
         <Button variant="outlined">add +</Button>
       </Link>
 
-      {result.isLoading ? (
+      {isLoading ? (
         <h1>Loading...</h1>
       ) : (
-        result.data.map((todo) => (
+        data.map((todo) => (
           <div
             key={todo.id}
             style={{ display: "flex", justifyContent: "space-around" }}
