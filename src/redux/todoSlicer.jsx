@@ -24,13 +24,26 @@ export const fetchTodoById = createAsyncThunk("fetchTodoById", async (id) => {
     throw error;
   }
 });
+// export const fetchTodoById = createAsyncThunk("fetchTodoById", async (id) => {
+//   try {
+//     const data = await fetch("https://www.melivecode.com/api/users/" + id);
+//     const response = await data.json();
+//     console.log("fetchTodoByID response:", response); // Log the response
+//     return response;
+//   } catch (error) {
+//     console.error("Error fetchTodoByID todo:", error);
+//     throw error;
+//   }
+// });
 // add todo
 export const addTodo = createAsyncThunk("addTodo", async (requestBody) => {
+  console.log('requestBody');
   try {
     const url = "https://www.melivecode.com/api/users/create";
     const headers = {
       "Content-Type": "application/json",
     };
+
     const data = await fetch(url, {
       method: "POST",
       headers: headers,
@@ -80,7 +93,7 @@ export const updateTodo = createAsyncThunk(
       });
       const response = await data.json();
       console.log("UpdateTodo response:", response);
-      return response;
+      return response.user;
     } catch (error) {
       console.error("Error DeleteTodo todo:", error);
       throw error;
@@ -93,7 +106,10 @@ const todoSlice = createSlice({
   initialState: {
     isLoading: false,
     data: [],
+    todoDetail: {}, //to store single todo data when fetching from server
     error: false,
+    success: false,
+    message: "",
   },
   extraReducers: (builder) => {
     // fetch todo
@@ -109,32 +125,57 @@ const todoSlice = createSlice({
       state.error = true;
     });
     //fetch todo by id
-    builder.addCase(fetchTodoById.fulfilled, (state, action) => {
-      console.log("fetchByID.fullfilled=>", action);
-    });
-    // add Todo
-    builder.addCase(addTodo.pending, (state) => {
+    builder.addCase(fetchTodoById.pending, (state) => {
       state.isLoading = true;
     });
+    builder.addCase(fetchTodoById.fulfilled, (state, action) => {
+      console.log(action.payload.user);
+      state.isLoading = false;
+      state.todoDetail = action.payload.user;
+    });
+    builder.addCase(fetchTodoById.rejected, (state) => {
+      state.error = true;
+    });
+    // add Todo
+    builder.addCase(addTodo.pending, (state, action) => {
+      state.isLoading = true;
+      state.message = action.payload.message;
+    });
     builder.addCase(addTodo.fulfilled, (state, action) => {
+      state.message = action.payload.message;
+      state.success = true;
+      console.log(state.message);
       state.data.push(action.payload.user);
       console.log("add.fullfilled=>", action.payload);
     });
-    builder.addCase(addTodo.rejected, (state,action) => {
-        state.error = true;
-        console.log("add.rejected=>", action.payload);
+    builder.addCase(addTodo.rejected, (state) => {
+      state.message = "An error has occurred";
+      console.log(state.message);
+
+      state.error = true;
     });
 
     //delete todo
     builder.addCase(deleteTodo.fulfilled, (state, action) => {
       console.log("delete.fullfilled:", action);
     });
+
     //update todo
+    // There should be 3 state for each addCase
     builder.addCase(updateTodo.pending, (state, action) => {
+      state.isLoading = true;
       console.log("addPending_Update:", action);
     });
     builder.addCase(updateTodo.fulfilled, (state, action) => {
-      console.log("addFulffiled_Update:", action.payload);
+      console.log("updateTodo.fulfilled:", action.payload);
+      state.isLoading = false;
+      const updatedTodoIndex = state.data.findIndex(
+        (item) => item.id === action.payload.id
+      );
+
+      if (updatedTodoIndex > -1) {
+        state.data[updatedTodoIndex] = action.payload;
+      }
     });
     builder.addCase(updateTodo.rejected, (state, action) => {
       console.log("addreject_Update:", action);

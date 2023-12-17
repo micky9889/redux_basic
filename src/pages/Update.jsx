@@ -2,12 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import { useDispatch,  } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchTodoById, updateTodo } from "../redux/todoSlicer";
 
 const Update = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { todoDetail } = useSelector((state) => state.todo);
   const { id } = useParams();
 
   const [formData, setFormData] = useState({
@@ -18,23 +19,21 @@ const Update = () => {
     email: "",
     avatar: "",
   });
-  useEffect(() => {
-    fetchData();
-  }, [dispatch, id]);
 
-  const fetchData = async () => {
-    const todoData = await dispatch(fetchTodoById(id));
-    const dataById = todoData.payload.user;
-    // console.log("mick:", dataById);
-    setFormData({
-      fname: dataById.fname,
-      lname: dataById.lname,
-      username: dataById.username,
-      password: dataById.password || "",
-      email: dataById.email || "",
-      avatar: dataById.avatar,
-    });
-  };
+  // const fetchData = () => {
+  //   // const todoData = await dispatch(fetchTodoById(id));
+  //   dispatch(fetchTodoById(id));
+  //   // const dataById = todoData.payload.user;
+  //   // console.log("mick:", dataById);
+  //   setFormData({
+  //     fname: todoDetail?.fname,
+  //     lname: todoDetail?.lname,
+  //     username: todoDetail?.username,
+  //     password: todoDetail?.password || "",
+  //     email: todoDetail?.email || "",
+  //     avatar: todoDetail?.avatar,
+  //   });
+  // };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -43,6 +42,23 @@ const Update = () => {
       [name]: value,
     });
   };
+
+  useEffect(() => {
+    dispatch(fetchTodoById(id));
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    if (todoDetail && todoDetail !== undefined) {
+      setFormData({
+        fname: todoDetail?.fname,
+        lname: todoDetail?.lname,
+        username: todoDetail?.username,
+        password: todoDetail?.password || "",
+        email: todoDetail?.email || "",
+        avatar: todoDetail?.avatar,
+      });
+    }
+  }, [todoDetail]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -57,7 +73,6 @@ const Update = () => {
   const home = () => {
     navigate("/");
   };
-
   return (
     <Container maxWidth="sm">
       <Button onClick={home}>back home</Button>

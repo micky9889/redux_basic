@@ -1,14 +1,21 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, TextField, Button, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { addTodo } from "../redux/todoSlicer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 
 const Create = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const {
+    data,
+    success,
+    isLoading,
+    error,
+    message: todoMessage,
+  } = useSelector((state) => state.todo);
 
   const [formData, setFormData] = useState({
     fname: "",
@@ -27,34 +34,61 @@ const Create = () => {
     });
   };
 
-  const handleSubmit = async (event) => {
+  // useEffect(() => {
+  //   if (!isLoading && !error) {
+  //     Swal.fire({
+  //       icon: "success",
+  //       // title: `${result.payload.message}.!`,
+  //       title: `${message}.!`,
+  //       showConfirmButton: false,
+  //       timer: 1500,
+  //     }).then(() => {
+  //       navigate("/");
+  //     });
+  //   } else {
+  //     Swal.fire({
+  //       icon: "error",
+  //       // title: `${result.payload.message}.!`,
+  //       title: `${message}.!`,
+  //       showConfirmButton: false,
+  //       timer: 1500,
+  //     });
+  //     // .then(() => {
+  //     // navigate("/");
+  //     // });
+  //   }
+  // }, [error, message, isLoading, navigate]);
+
+  const handleSubmit = (event) => {
     event.preventDefault();
     try {
-      const result = await dispatch(addTodo(formData));
-      console.log("res:", result);
-      if (result.payload.status == "ok") {
-        Swal.fire({
-          icon: "success",
-          title: `${result.payload.message}.!`,
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          navigate("/");
-        });
-      }else{
-        Swal.fire({
-          icon: "error",
-          title: `${result.payload.message}.!`,
-          showConfirmButton: false,
-          timer: 1500,
-        })
-        // .then(() => {
-          // navigate("/");
-        // });
-      }
+      // const result = await dispatch(addTodo(formData));
+      dispatch(addTodo(formData));
     } catch (error) {
       console.log(error);
     }
+    // if (success && !error) {
+    //   Swal.fire({
+    //     icon: "success",
+    //     // title: `${result.payload.message}.!`,
+    //     title: `${todoMessage}.!`,
+    //     showConfirmButton: false,
+    //     timer: 1500,
+    //   }).then(() => {
+    //     navigate("/");
+    //   });
+    // } else {
+    //   Swal.fire({
+    //     icon: "error",
+    //     // title: `${result.payload.message}.!`,
+    //     title: `${'error'}.!`,
+    //     showConfirmButton: false,
+    //     timer: 1500,
+    //   });
+    //   // .then(() => {
+    //   // navigate("/");
+    //   // });
+    // }
   };
   const home = () => {
     navigate("/");
@@ -62,6 +96,7 @@ const Create = () => {
 
   return (
     <Container maxWidth="sm">
+      {/* {message && <p>{message}</p>} */}
       <Button onClick={home}>back home</Button>
       <Box
         sx={{
